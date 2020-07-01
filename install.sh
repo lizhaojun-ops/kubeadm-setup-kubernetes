@@ -15,30 +15,12 @@ K8SINSTALL() {
     ./bin/download.sh
     sleep 3s
     ./bin/kube-system-init.sh
-    sleep 3s
-    ./bin/kube-ca-create.sh
-    sleep 10s
-    ./bin/kube-kubectl-install.sh
-    sleep 10s
-    ./bin/kube-etcd-install.sh
-    sleep 10s
-    ./bin/kube-flanneld-install.sh
     sleep 10s
     ./bin/kube-keepalived-install.sh
     sleep 10s
-    ./bin/kube-apiserver-install.sh
-    sleep 10s
-    ./bin/kube-controller-manager-install.sh
-    sleep 10s
-    ./bin/kube-scheduler-install.sh
-    sleep 10s
     ./bin/kube-docker-install.sh
     sleep 10s
-    ./bin/kube-kubelet-install.sh
-    sleep 10s
-    ./bin/kube-proxy-install.sh
-    sleep 10s
-    ./bin/kube-coredns-install.sh
+    ./bin/kube-kubeadm-install.sh
     sleep 10s
     ./bin/kube-ingress-install.sh
     sleep 10s

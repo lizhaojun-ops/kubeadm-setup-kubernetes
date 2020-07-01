@@ -15,7 +15,6 @@ for node_ip in ${NODE_IPS[@]}
     ssh root@${node_ip} "mkdir -p /etc/docker/certs.d/docker-hub.cloud.top"
     ssh root@${node_ip} "rm -rf /var/lib/docker"
     ssh root@${node_ip} "rm -rf /srv/data/docker"
-    scp ./conf/docker.service root@${node_ip}:/usr/lib/systemd/system/docker.service 
     scp ./conf/daemon.json root@${node_ip}:/etc/docker/daemon.json
     scp ./conf/http-proxy.conf root@${node_ip}:/etc/systemd/system/docker.service.d/http-proxy.conf
     scp ./conf/harbor.tophc.top.crt root@${node_ip}:/etc/docker/certs.d/harbor.tophc.top/harbor.crt

@@ -55,8 +55,7 @@ do
   ssh root@${node} "ntpdate -u 172.19.30.116; clock -w; systemctl disable ntpd; systemctl stop ntpd;"
   ssh root@${node} "systemctl restart rsyslog; systemctl restart crond"
   ssh root@${node} "cp /etc/sysctl.conf /etc/sysctl.conf.back; echo > /etc/sysctl.conf; sysctl -p"
-  ssh root@${node} "mkdir -p  /opt/k8s/{bin,work,yaml} /etc/{kubernetes,etcd}/cert"
-  ssh root@${node} "echo 'PATH=/opt/k8s/bin:\$PATH' >> /etc/profile"
+  ssh root@${node} "mkdir -p  /opt/k8s/{bin,work,yaml}"
   scp ./conf/kubernetes.conf root@${node}:/etc/sysctl.d/kubernetes.conf
   scp -r ./work/hosts  root@${node}:/etc/hosts
   scp -r ./conf/environment.conf  root@${node}:/opt/k8s/bin/environment.sh
@@ -94,9 +93,7 @@ for node in ${NODE_NAMES[@]};
           ssh root@${node} "for m in ip_vs ip_vs_lc ip_vs_wlc ip_vs_rr ip_vs_wrr ip_vs_lblc ip_vs_lblcr ip_vs_dh ip_vs_sh ip_vs_nq ip_vs_sed ip_vs_ftp nf_conntrack_ipv4 br_netfilter; do modprobe -- \$m; done"
           ssh root@${node} "lsmod |egrep 'ip_vs*|nf_conntrack_ipv4|br_netfilter';"
           ssh root@${node} "sysctl -p /etc/sysctl.d/kubernetes.conf"
-          ssh root@${node} "mkdir -p  /opt/k8s/{bin,work} /etc/{kubernetes,etcd}/cert"
           ssh root@${node} "chmod +x /opt/k8s/bin/*"
-          ssh root@${node} "export PATH=/opt/k8s/bin:\$PATH"
           sleep 3s
           ssh root@${node} "reboot"
           echo ">>>>>>>>>> ${node} install ok <<<<<<<<<"
@@ -115,7 +112,7 @@ for node in ${NODE_NAMES[@]};
    do
      ping -c 4 -w 100  ${node} > /dev/null
        if [[ $? = 0 ]];then
-          echo " ${node} 节点 ping ok,开始下一步的etcd安装"
+          echo " ${node} 节点 ping ok,开始apiserver负载均衡模块安装"
           break
         else
           echo " ${node} 节点还未reboot成功,请稍后... "

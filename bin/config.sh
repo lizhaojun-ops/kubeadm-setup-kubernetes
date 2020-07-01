@@ -219,7 +219,7 @@ export INGRESS_TYPE="nodeport"          #ingress安装类型,可选hostnetwork�
 # 服务网段，部署前路由不可达，部署后集群内路由可达(kube-proxy 保证); 不建议修改
 SERVICE_CIDR="10.254.0.0/16" 
 # Pod 网段，建议 /16 段地址，部署前路由不可达，部署后集群内路由可达(flanneld 保证); 不建议修改
-CLUSTER_CIDR="10.138.0.0/16"
+CLUSTER_CIDR="10.244.0.0/16"
 # 服务端口范围限制 (NodePort Range); 不建议修改
 export NODE_PORT_RANGE="1024-32767"
 # flanneld 网络配置前缀; 不建议修改
@@ -235,4 +235,54 @@ export PATH=/opt/k8s/bin:\$PATH
 # 生成 EncryptionConfig 所需的加密 key
 export ENCRYPTION_KEY=\$(head -c 32 /dev/urandom | base64)
 
+EOF
+
+
+cat > ./conf/init-config.yaml <<EOF
+apiVersion: kubeadm.k8s.io/v1beta1
+bootstrapTokens:
+- groups:
+  - system:bootstrappers:kubeadm:default-node-token
+  token: abcdef.0123456789abcdef
+  ttl: 24h0m0s
+  usages:
+  - signing
+  - authentication
+kind: InitConfiguration
+localAPIEndpoint:
+  advertiseAddress: $KUBE_APISERVER_VIP
+  bindPort: 6443
+nodeRegistration:
+  criSocket: /var/run/dockershim.sock
+  name: tks-$DEPARTMENT-$ENVIRONMENT-$SERVICE_NAME-nodepool-$NODEPOOLID-1
+  taints:
+  - effect: NoSchedule
+    key: node-role.kubernetes.io/master
+---
+apiServer:
+  timeoutForControlPlane: 4m0s
+apiVersion: kubeadm.k8s.io/v1beta1
+certificatesDir: /etc/kubernetes/pki
+clusterName: tks-$DEPARTMENT-$ENVIRONMENT-$SERVICE_NAME-nodepool-$NODEPOOLID
+controlPlaneEndpoint: "$KUBE_APISERVER_VIP:8443"
+controllerManager: {}
+dns:
+  type: CoreDNS
+etcd:
+  local:
+    dataDir: /var/lib/etcd
+imageRepository: harbor.tophc.top/kubernetes
+kind: ClusterConfiguration
+kubernetesVersion: v1.14.8
+networking:
+  dnsDomain: cluster.local
+  podSubnet: "10.244.0.0/16"
+  serviceSubnet: "10.254.0.0/16"
+scheduler: {}
+---
+apiVersion: kubeproxy.config.k8s.io/v1alpha1
+kind: KubeProxyConfiguration
+featureGates:
+  SupportIPVSProxyMode: true
+mode: ipvs
 EOF
