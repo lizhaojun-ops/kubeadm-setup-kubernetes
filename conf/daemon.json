@@ -1,0 +1,10 @@
+{
+    "exec-opts": ["native.cgroupdriver=systemd"],
+    "registry-mirrors": ["https://n8tt8v04.mirror.aliyuncs.com"],
+    "graph":"/srv/data/docker",
+    "log-driver": "json-file",
+    "log-opts": {
+      "max-size": "100m"
+    },
+    "storage-driver": "overlay2"
+  }
