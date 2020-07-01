@@ -22,6 +22,8 @@ K8SINSTALL() {
     sleep 10s
     ./bin/kube-kubeadm-install.sh
     sleep 10s
+    ./bin/kube-flanneld-install.sh
+    sleep 10s
     ./bin/kube-ingress-install.sh
     sleep 10s
     ./bin/kube-metrics-server-install.sh
